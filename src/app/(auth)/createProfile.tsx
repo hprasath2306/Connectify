@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/src/lib/supabase";
-import { StyleSheet, View, Alert, ScrollView, Image, ActivityIndicator, Text } from "react-native";
+import { StyleSheet, View, Alert, ScrollView, ToastAndroid } from "react-native";
 import { Button, Input } from "@rneui/themed";
 import { useAuth } from "@/src/providers/AuthProvider";
 import Avatar from "@/src/components/Avatar";
@@ -8,7 +8,7 @@ import { StreamChat } from "stream-chat";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 
-export default function ProfileScreen() {
+export default function CreateProfile() {
   const { session } = useAuth();
   const [image, setImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -20,6 +20,14 @@ export default function ProfileScreen() {
   const chatClient = StreamChat.getInstance("r29ubtmnckk8");
 
   const updateLogic = async () => {
+    if (!fullname || fullname === "") {
+      ToastAndroid.showWithGravity(
+        "Please enter your full name.",
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER
+      );
+      return;
+    }
     updateProfile({
       username,
       website,
@@ -30,7 +38,8 @@ export default function ProfileScreen() {
       await chatClient.upsertUser({
         id: session?.user.id!,
         name: fullname,
-        image: supabase.storage.from("avatars").getPublicUrl(avatarUrl!).data.publicUrl,
+        image: supabase.storage.from("avatars").getPublicUrl(avatarUrl!).data
+          .publicUrl,
       });
     };
     update();
@@ -69,10 +78,6 @@ export default function ProfileScreen() {
     } finally {
       setLoading(false);
     }
-  }
-
-  if(loading){  
-    return <ActivityIndicator />
   }
 
   async function updateProfile({
@@ -139,31 +144,14 @@ export default function ProfileScreen() {
           value={fullname || ""}
           onChangeText={(text) => setFullName(text)}
         />
-        {(!fullname || fullname==="") && <Text
-        style={{
-          color: "red",
-          fontSize: 12,
-          marginLeft: 10,
-          marginTop:-20
-        }}
-        >Full Name is required</Text>}
       </View>
 
       <View style={[styles.verticallySpaced, styles.mt20]}>
         <Button
-          title={loading ? "Loading ..." : "Update"}
+          title={loading ? "Loading ..." : "Create Profile"}
           onPress={() => updateLogic()}
           disabled={loading}
-          color={'#686CEA'}
         />
-      </View>
-
-      <View style={styles.verticallySpaced}>
-        <Button color={'#686CEA'} title="Sign Out" onPress={async() => {supabase.auth.signOut()
-          await AsyncStorage.clear();
-        }
-
-        } />
       </View>
     </ScrollView>
   );

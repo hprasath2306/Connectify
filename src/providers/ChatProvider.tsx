@@ -14,8 +14,7 @@ export default function ChatProvider({ children }: PropsWithChildren) {
   useEffect(() => {
     if(!profile) return;
     const connect = async () => {
-      await client.connectUser(
-        {
+      await client.connectUser({
           id: profile.id,
           name: profile.full_name,
           image: supabase.storage.from("avatars").getPublicUrl(profile.avatar_url).data.publicUrl,

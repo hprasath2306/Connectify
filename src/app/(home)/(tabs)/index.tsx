@@ -14,7 +14,7 @@ export default function MainTabScreen() {
               <FontAwesome5
                 name="users"
                 size={22}
-                color="gray"
+                color="#686CEA"
                 style={{ marginHorizontal: 15 }}
               />
             </Link>
